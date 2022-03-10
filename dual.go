@@ -13,15 +13,15 @@ package cm
 // the maps will be initialized. NewDualMap is provided for your
 // convenience if you want a DualMap with guaranteed-non-nil internal maps.
 type DualMap[LK, RK comparable, V any] struct {
-	Left  MultiLevelMap2[LK, RK, V]
-	Right MultiLevelMap2[RK, LK, V]
+	Left  MapMap[LK, RK, V]
+	Right MapMap[RK, LK, V]
 }
 
 // NewDualMap returns a new DualMap with the maps empty instead of nil.
 func NewDualMap[LK, RK comparable, V any]() DualMap[LK, RK, V] {
 	return DualMap[LK, RK, V]{
-		MultiLevelMap2[LK, RK, V]{},
-		MultiLevelMap2[RK, LK, V]{},
+		MapMap[LK, RK, V]{},
+		MapMap[RK, LK, V]{},
 	}
 }
 
@@ -31,8 +31,8 @@ func (dm *DualMap[LK, RK, V]) Set(
 	value V,
 ) {
 	if dm.Left == nil {
-		dm.Left = MultiLevelMap2[LK, RK, V]{}
-		dm.Right = MultiLevelMap2[RK, LK, V]{}
+		dm.Left = MapMap[LK, RK, V]{}
+		dm.Right = MapMap[RK, LK, V]{}
 	}
 	dm.Left.Set(l, r, value)
 	dm.Right.Set(r, l, value)

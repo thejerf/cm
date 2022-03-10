@@ -12,12 +12,12 @@ func TestDualMaps(t *testing.T) {
 	dm.Set(0, "a", 100)
 
 	expected := DualMap[int, string, int]{
-		MultiLevelMap2[int, string, int]{
+		MapMap[int, string, int]{
 			0: map[string]int{
 				"a": 100,
 			},
 		},
-		MultiLevelMap2[string, int, int]{
+		MapMap[string, int, int]{
 			"a": map[int]int{
 				0: 100,
 			},

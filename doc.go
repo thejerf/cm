@@ -7,6 +7,11 @@ maps (maps that can be accessed by two distinct keys).
 This package provides no locking in the datastructures. All locking is
 the responsibility of code using these maps.
 
+This code panics analogously to normal map behaviors. When there is no
+existing map behavior to guide, it tries to match the same logic Go
+normally uses. This is justified because these are just wrappers around
+maps, rather than independent data structures.
+
 Multilevel Maps
 
 Multi-level maps are maps that have other maps as their values.
@@ -66,6 +71,48 @@ penalty. As you get into needs for three or more keys, the cost of this
 technique multiplies resource consumption by the number of permutations
 of the keys, which by three keys is already six times a single map.
 So this package stops at dual-level maps.
+
+Map Sets
+
+A MapSet is a map, whose value is a set. Several convenience functions can
+be implemented for manipulating such values.
+
+As a consequence of offering this functionality, this package also provides
+a Set implementation.
+
+Map Slice
+
+A MapSlice is a map whose value is a slice. While there aren't that
+many useful methods that can be offered for this case, the Append method
+comes up a lot in my code.
+
+Key Trees And Key Slices
+
+Each of these structures implements the ability to get data structures
+representing the set of all keys, or keys and values in the set, as a
+single static data structure.
+
+It is an anti-pattern to use them as such:
+
+    keySlice := someMapMap.KeySlice()
+    for _, keys := range keySlice {
+        // ...
+    }
+
+This causes the needless instantiation of a data structure in memory.
+This should be written as
+
+    for key1, submap := range someMapMap {
+        for key2, val := range submap {
+            // do work here
+        }
+    }
+
+And likewise for the other structures. This package deliberately does not
+provide any sort of "iterator" or "callbacks" because that affords
+needlessly slow code. If Go ever develops efficient, generic iterators
+this package may support them. Until then, anything you can do to use
+normal range statements is best, even if it's a bit more syntax.
 
 */
 package cm
