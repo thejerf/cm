@@ -1,6 +1,8 @@
 Complex Generic Maps for Go
 ===========================
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/thejerf/cm.svg)](https://pkg.go.dev/github.com/thejerf/cm)
+
     go get github.com/thejerf/cm
 
     import "github.com/thejerf/cm"
