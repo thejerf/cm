@@ -14,9 +14,11 @@ Complex Generic Maps for Go
     the equivalent of `map[K1]map[K2]Value` and
     `map[K1]map[K2]map[K3]Value` respectively, for easily setting and
     fetching values.
-  * DualMap implements a map that can be keyed by either of two keys,
+  * `DualMap` implements a map that can be keyed by either of two keys,
     packaging up a `map[Left]map[Right]Value` and
     `map[Right]map[Left]Value` into a single coherent package.
+  * `MapSlice` implements a map that contains slices, like `map[K][]V`.
+  * `MapSet` implements a map that contains sets, like `map[K]Set[V]`.
 
 There's nothing particularly "special" about this implementation, no magic
 sauce or anything. Just code I've had to write in several projects and
