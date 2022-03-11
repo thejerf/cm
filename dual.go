@@ -12,16 +12,20 @@ package cm
 // The zero-value of this struct is safe to use. When Set is first used,
 // the maps will be initialized. NewDualMap is provided for your
 // convenience if you want a DualMap with guaranteed-non-nil internal maps.
+//
+// Direct read access is permissible. You should not directly write to the
+// maps. DualMap makes no guarantees if you directly write to the internal
+// maps.
 type DualMap[LK, RK comparable, V any] struct {
-	Left  MapMap[LK, RK, V]
-	Right MapMap[RK, LK, V]
+	Left  MapMapAny[LK, RK, V]
+	Right MapMapAny[RK, LK, V]
 }
 
 // NewDualMap returns a new DualMap with the maps empty instead of nil.
 func NewDualMap[LK, RK comparable, V any]() DualMap[LK, RK, V] {
 	return DualMap[LK, RK, V]{
-		MapMap[LK, RK, V]{},
-		MapMap[RK, LK, V]{},
+		MapMapAny[LK, RK, V]{},
+		MapMapAny[RK, LK, V]{},
 	}
 }
 
@@ -31,8 +35,8 @@ func (dm *DualMap[LK, RK, V]) Set(
 	value V,
 ) {
 	if dm.Left == nil {
-		dm.Left = MapMap[LK, RK, V]{}
-		dm.Right = MapMap[RK, LK, V]{}
+		dm.Left = MapMapAny[LK, RK, V]{}
+		dm.Right = MapMapAny[RK, LK, V]{}
 	}
 	dm.Left.Set(l, r, value)
 	dm.Right.Set(r, l, value)

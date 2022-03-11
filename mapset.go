@@ -20,7 +20,19 @@ package cm
 // naturally simply by indexing the top-level map, even if that results in
 // a nil set. This package only implements methods that are value-adds on
 // top of direct map access, such as Set, which creates the map entry to a
-// valid set if necessary.
+// valid set if necessary. For instance, there is no need for a .Contains
+// method; you can simply
+//
+//   ms := MapSet[int, int]{}
+//   ms[0].Contains(1) // will be false
+//
+// This is legal, and will not vivify the set into the MapSet.
+//
+// This is why there are so few methods on MapSet; the vast majority of set
+// operations work by direct reference into the MapSet's map, even if there
+// is no set there. Only the operations on Set that panic if they are
+// called on a nil set need to be wrapped by this data type, or Delete,
+// which cleans up the set if it is empty.
 type MapSet[K, V comparable] map[K]Set[V]
 
 // AllValueSet returns a single set containing all values in the MapSet.
@@ -38,7 +50,7 @@ func (ms MapSet[K, V]) AllValueSet() Set[V] {
 	return retSet
 }
 
-func (ms MapSet[K, V]) Set(key K, val V) {
+func (ms MapSet[K, V]) Add(key K, val V) {
 	if ms == nil {
 		panic("Set called on a nil MapSet")
 	}
@@ -50,27 +62,30 @@ func (ms MapSet[K, V]) Set(key K, val V) {
 	s[val] = void
 }
 
-func (ms MapSet[K, V]) Contains(key K, val V) bool {
+// Union will union the passed-in set into the Set for the given key,
+// creating it if necessary.
+func (ms MapSet[K, V]) Union(key K, r Set[V]) {
 	if ms == nil {
-		return false
+		panic("Union called on a nil MapSet")
 	}
 	s := ms[key]
 	if s == nil {
-		return false
+		s = Set[V]{}
+		ms[key] = s
 	}
-	return s.Contains(val)
-}
+	s.Union(r)
+} 
 
 func (ms MapSet[K, V]) Delete(key K, val V) {
-	if ms == nil {
-		return
-	}
-	s := ms[key]
-	if s == nil {
-		return
-	}
-	delete(s, val)
-	if len(s) == 0 {
-		delete(ms, key)
-	}
+       if ms == nil {
+               return
+       }
+       s := ms[key]
+       if s == nil {
+               return
+       }
+       delete(s, val)
+       if len(s) == 0 {
+               delete(ms, key)
+       }
 }

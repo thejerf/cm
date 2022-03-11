@@ -9,10 +9,16 @@ package cm
 // in a set, use length(), to iterate over the set, use range in a for
 // loop, etc. This only implements additional useful set functionality.
 //
+// This Set offer high-efficiency mutating operations on the map; for
+// instance, Union will copy the target Set into the Set the method is
+// called on. To get the behavior where a separate Set is returned that is
+// a union, add .Clone() to the appropriate place in your code.
+//
 // It is safe to directly manipulate a set using map syntax in Go. This
 // data type does not make any guarantees that would be violated.
 //
-// The nil Set is mostly legal, except you can not .Add or .Union it.
+// The nil Set is mostly legal and functions as an empty set, except you
+// can not .Add or .Union it.
 type Set[M comparable] map[M]struct{}
 
 var void = struct{}{}
@@ -139,7 +145,7 @@ func (s Set[M]) Remove(v M) {
 // is then returned, allowing chaining.
 func (s Set[M]) Union(r Set[M]) Set[M] {
 	if s == nil {
-		panic("Union called on Set")
+		panic("Union called on nil Set")
 	}
 	for v := range r {
 		s[v] = void

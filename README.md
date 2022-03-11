@@ -1,7 +1,7 @@
 Complex Generic Maps for Go
 ===========================
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/thejerf/cm.svg)](https://pkg.go.dev/github.com/thejerf/cm)
+[![Go Reference](https://pkg.go.dev/badge/github.com/thejerf/cm.svg)](https://pkg.go.dev/github.com/thejerf/cm)<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-100%25-brightgreen.svg?longCache=true&style=flat)</a>
 
     go get github.com/thejerf/cm
 
@@ -9,9 +9,9 @@ Complex Generic Maps for Go
 
 `cm` provides some generic complex maps for Go;
 
-  * `MapMap` and `MapMapMap` provide maps based on two and
-    three keys that provide some convenience functions around
-    the equivalent of `map[K1]map[K2]Value` and
+  * `MapMap`, `MapMapMap`, `MapMapAny`, and `MapMapMapAny` provide maps
+    based on two and three keys that provide some convenience functions
+    around  the equivalent of `map[K1]map[K2]Value` and
     `map[K1]map[K2]map[K3]Value` respectively, for easily setting and
     fetching values.
   * `DualMap` implements a map that can be keyed by either of two keys,
@@ -25,10 +25,41 @@ sauce or anything. Just code I've had to write in several projects and
 would like to get factored out and into a well-tested library, rather than
 write over and over.
 
+MapMap(Map) vs. MapMap(Map)Any
+==============================
+
+I took inspiration from the
+current
+[maps package](https://pkg.go.dev/golang.org/x/exp@v0.0.0-20220307200941-a1099baf94bf/maps) and
+tried to implement all the functionality present there on the multi-level
+maps.
+
+In order to implement `.Equal`, the values of the map must be `comparable`.
+The `MapMap` and `MapMapMap` types implement this restriction, because
+many things stored in maps are indeed `comparable`. All methods on
+`MapMap(Map)Any` are available for those maps, and they also have a
+`.Equal`.
+
+If you want to store a non-`comparable` value in the map, `MapMap(Map)Any`
+is available. It drops the `comparable` restriction on the Value, and loses
+the `.Equal` method as a result. Switching the type of the map should not
+be very complicated in general, as the method sets are almost identical.
+
+Performance
+===========
+
+All of these methods are extremely strong candidates for inlining. Some
+brief checks with `-gcflags="-m"` on some test programs suggest that
+they are indeed all inlined. Consequently, this library should generally
+be zero-performance-impact versus having directly written the code.
+(There are a few places where nil is checked for where you might not have,
+but a highly-predictable branch should be lost in the noise compared to
+what even one map lookup requires.)
+
 Status
 ======
 
-version v0.2.0 is new, but headed towards production-grade. I intend to use
+version v0.3.0 is new, but headed towards production-grade. I intend to use
 this in my code.
 
 PRs
@@ -61,10 +92,12 @@ Changelog
 cm uses semantic versioning.
 
 At the moment, this is in pre-release, which means no guarantees whatsoever
-about backwards compatibility. I would expect there's a reasonably chance
-of at least some incompatible changes in the future, though I wouldn't
-expect them to be major.
+about backwards compatibility. Change is still happening frequently as I
+hone in on the best solutions.
 
+* 0.3.0:
+    * Worked out a way to recover the `.Equal` method without a lot
+      of nasty casting on values.
 * 0.2.0:
     * Renamed almost everything to something shorter, but also more
       comprehensible, I hope.

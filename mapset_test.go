@@ -8,9 +8,9 @@ import (
 func TestMapSet(t *testing.T) {
 	{
 		ms := MapSet[int, int]{}
-		ms.Set(1, 3)
-		ms.Set(1, 4)
-		ms.Set(4, 5)
+		ms.Add(1, 3)
+		ms.Add(1, 4)
+		ms.Add(4, 5)
 
 		if !ms.AllValueSet().Equal(SetFromSlice[int]([]int{3, 4, 5})) {
 			t.Fatal("AllValueSet didn't work")
@@ -19,18 +19,8 @@ func TestMapSet(t *testing.T) {
 
 	{
 		ms := MapSet[int, int]{}
-		ms.Set(1, 2)
-		ms.Set(1, 3)
-
-		if !ms.Contains(1, 3) {
-			t.Fatal("MapSet fails to contain things")
-		}
-		if ms.Contains(1, 5) {
-			t.Fatal("MapSet contains things it shouldn't")
-		}
-		if ms.Contains(4, 5) {
-			t.Fatal("MapSet contains things it shouldn't")
-		}
+		ms.Add(1, 2)
+		ms.Add(1, 3)
 
 		ms.Delete(99, 99)
 		ms.Delete(1, 2)
@@ -39,14 +29,32 @@ func TestMapSet(t *testing.T) {
 			t.Fatal("delete doesn't clean up empty sets")
 		}
 	}
+
+	{
+		ms := MapSet[int, int]{}
+		s1 := SetFromSlice[int]([]int{1})
+		s2 := SetFromSlice[int]([]int{2})
+
+		ms.Union(0, s1)
+		if !ms[0].Contains(1) {
+			t.Fatal("union didn't work")
+		}
+
+		ms.Union(0, s2)
+		if !ms[0].Contains(2) {
+			t.Fatal("union didn't work")
+		}
+	}
 }
 
 func TestNilMapSet(t *testing.T) {
 	var ms MapSet[int, int]
 
-	panics(t, "failed on MapSet.Set", func() { ms.Set(1, 2) })
-	if ms.Contains(1, 2) {
+	panics(t, "failed on MapSet.Add", func() { ms.Add(1, 2) })
+	if ms[0].Contains(2) {
 		t.Fatal("nil MapSet contains something?")
 	}
 	ms.Delete(1, 2) // should not panic
+	panics(t, "failed on MapSet.Union",
+		func() { ms.Union(0, SetFromSlice[int]([]int{1})) })
 }

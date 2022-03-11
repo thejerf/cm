@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestMapMapMap(t *testing.T) {
-	mlm := MapMapMap[int, int, int, int]{}
+func TestMapMapMapAny(t *testing.T) {
+	mlm := MapMapMapAny[int, int, int, int]{}
 
 	mlm.Set(0, 1, 2, 3)
 	mlm.SetByTuple(Tuple3[int, int, int]{4, 5, 6}, 7)
@@ -92,8 +92,8 @@ func TestMapMapMap(t *testing.T) {
 
 	mlm.Delete(0, 1, 2)
 	if !reflect.DeepEqual(mlm,
-		MapMapMap[int, int, int, int]{
-			4: MapMap[int, int, int]{
+		MapMapMapAny[int, int, int, int]{
+			4: MapMapAny[int, int, int]{
 				5: map[int]int{6: 7},
 			},
 		},
@@ -105,8 +105,8 @@ func TestMapMapMap(t *testing.T) {
 	mlm.DeleteByTuple(Tuple3[int, int, int]{4, 99, 99})
 	mlm.DeleteByTuple(Tuple3[int, int, int]{99, 99, 99})
 	if !reflect.DeepEqual(mlm,
-		MapMapMap[int, int, int, int]{
-			4: MapMap[int, int, int]{
+		MapMapMapAny[int, int, int, int]{
+			4: MapMapAny[int, int, int]{
 				5: map[int]int{6: 7},
 			},
 		},
@@ -122,7 +122,7 @@ func TestMapMapMap(t *testing.T) {
 
 func TestMapMapMapCloneAndEqual(t *testing.T) {
 	{
-		mm1 := MapMapMap[int, int, int, int]{}
+		mm1 := MapMapMapAny[int, int, int, int]{}
 		mm1.Set(0, 1, 2, 3)
 
 		mm2 := mm1.Clone()
@@ -142,15 +142,15 @@ func TestMapMapMapCloneAndEqual(t *testing.T) {
 }
 
 func TestMapMapMapEqualFunc(t *testing.T) {
-	var mm1 MapMapMap[int, int, int, int]
-	var mm2 MapMapMap[int, int, int, int]
+	var mm1 MapMapMapAny[int, int, int, int]
+	var mm2 MapMapMapAny[int, int, int, int]
 
 	eqFunc := func(i, j int) bool { return i == j }
 
 	if !mm1.EqualFunc(mm2, eqFunc) {
 		t.Fatal("two nil maps compare unequal with EqualFunc")
 	}
-	mm1 = MapMapMap[int, int, int, int]{}
+	mm1 = MapMapMapAny[int, int, int, int]{}
 	if !mm1.EqualFunc(mm2, eqFunc) {
 		t.Fatal("two zero-length maps compare unequal with EqualFunc")
 	}
@@ -159,13 +159,13 @@ func TestMapMapMapEqualFunc(t *testing.T) {
 	if mm1.EqualFunc(mm2, eqFunc) {
 		t.Fatal("different maps compare equal with EqualFunc")
 	}
-	mm2 = MapMapMap[int, int, int, int]{}
+	mm2 = MapMapMapAny[int, int, int, int]{}
 	mm2.Set(3, 4, 5, 6)
 
 	if mm1.EqualFunc(mm2, eqFunc) {
 		t.Fatal("unequal maps compare equal with EqualFunc")
 	}
-	mm2 = MapMapMap[int, int, int, int]{}
+	mm2 = MapMapMapAny[int, int, int, int]{}
 	mm2.Set(0, 1, 5, 6)
 	if mm1.EqualFunc(mm2, eqFunc) {
 		t.Fatal("unequal maps compare equal with EqualFunc")
@@ -173,7 +173,7 @@ func TestMapMapMapEqualFunc(t *testing.T) {
 }
 
 func TestMapMapMapDeleteFunc(t *testing.T) {
-	var mmm MapMapMap[int, int, int, int]
+	var mmm MapMapMapAny[int, int, int, int]
 
 	delZero := func(k1, k2, k3, v int) bool {
 		return k1 == 0
@@ -182,7 +182,7 @@ func TestMapMapMapDeleteFunc(t *testing.T) {
 	// ensure this doesn't panic, as deleting from a nil map doesn't
 	mmm.DeleteFunc(delZero)
 
-	mmm = MapMapMap[int, int, int, int]{}
+	mmm = MapMapMapAny[int, int, int, int]{}
 
 	mmm.Set(0, 1, 2, 3)
 	mmm.Set(0, 1, 3, 4)
@@ -190,10 +190,76 @@ func TestMapMapMapDeleteFunc(t *testing.T) {
 
 	mmm.DeleteFunc(delZero)
 
-	mmmTarget := MapMapMap[int, int, int, int]{}
+	mmmTarget := MapMapMapAny[int, int, int, int]{}
 	mmmTarget.Set(1, 3, 4, 5)
 
 	if !reflect.DeepEqual(mmm, mmmTarget) {
 		t.Fatal("DeleteFunc did not operate correctly")
 	}
+}
+
+func TestMapMapMapEqual(t *testing.T) {
+	var mmm1 MapMapMap[int, int, int, int]
+	var mmm2 MapMapMap[int, int, int, int]
+
+	if !mmm1.Equal(mmm2) {
+		t.Fatal("two nil maps compare unequal with Equal")
+	}
+	mmm1 = MapMapMap[int, int, int, int]{}
+	if !mmm1.Equal(mmm2) {
+		t.Fatal("two zero-length maps compare as not equal")
+	}
+
+	mmm1.Set(0, 1, 2, 3)
+	if mmm1.Equal(mmm2) {
+		t.Fatal("different maps compare equal with Equal")
+	}
+	mmm2 = MapMapMap[int, int, int, int]{}
+	mmm2.Set(3, 4, 5, 6)
+
+	if mmm1.Equal(mmm2) {
+		t.Fatal("unequal maps compare equal with Equal")
+	}
+	mmm2 = MapMapMap[int, int, int, int]{}
+	mmm2.Set(0, 1, 5, 6)
+	if mmm1.Equal(mmm2) {
+		t.Fatal("unequal maps compare equal with Equal")
+	}
+}
+
+// This heavily leans on TestMapMapAny to cover the functionality.
+func TestMapMapMap(t *testing.T) {
+	mmm := MapMapMap[int, int, int, int]{}
+
+	mmm.Set(0, 1, 2, 3)
+
+	mmmClone := mmm.Clone()
+	if !mmmClone.Equal(mmm) {
+		t.Fatal("equal doesn't seem to work")
+	}
+
+	mmm.SetByTuple(Tuple3[int, int, int]{1, 2, 3}, 4)
+	mmm.Set(2, 3, 4, 5)
+	mmm.Set(3, 4, 5, 6)
+
+	mmm.Delete(0, 1, 2)
+	mmm.DeleteByTuple(Tuple3[int, int, int]{1, 2, 3})
+	mmm.DeleteFunc(func(int, int, int, int) bool { return false })
+
+	val, exists := mmm.Get(2, 3, 4)
+	if val != 5 || !exists {
+		t.Fatal("Get is wrong")
+	}
+	val, exists = mmm.GetByTuple(Tuple3[int, int, int]{2, 3, 4})
+	if val != 5 || !exists {
+		t.Fatal("GetByTuple is wrong")
+	}
+
+	mmmClone = mmm.Clone()
+	if !mmm.EqualFunc(mmmClone, func(x, y int) bool { return x == y }) {
+		t.Fatal("EqualFunc doesn't work.")
+	}
+
+	mmm.KeySlice()
+	mmm.KeyTree()
 }

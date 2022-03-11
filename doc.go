@@ -9,7 +9,10 @@ the responsibility of code using these maps.
 This code panics analogously to normal map behaviors. When there is no
 existing map behavior to guide, it tries to match the same logic Go
 normally uses. This is justified because these are just wrappers around
-maps, rather than independent data structures.
+maps, rather than independent data structures. Most or all of the places
+where this library panics is places where the code was going to panic
+anyhow; this library simply offers more specific messages about the
+panic.
 
 Multilevel Maps
 
@@ -107,11 +110,8 @@ This should be written as
         }
     }
 
-And likewise for the other structures. This package deliberately does not
-provide any sort of "iterator" or "callbacks" because that affords
-needlessly slow code. If Go ever develops efficient, generic iterators
-this package may support them. Until then, anything you can do to use
-normal range statements is best, even if it's a bit more syntax.
+Normal use of KeySlice and KeyTree would be sorting it somehow before
+iterating, or possibly serializing them somewhere.
 
 */
 package cm
