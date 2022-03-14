@@ -82,12 +82,6 @@ be implemented for manipulating such values.
 As a consequence of offering this functionality, this package also provides
 a Set implementation.
 
-Map Slice
-
-A MapSlice is a map whose value is a slice. While there aren't that
-many useful methods that can be offered for this case, the Append method
-comes up a lot in my code.
-
 Key Trees And Key Slices
 
 Each of these structures implements the ability to get data structures

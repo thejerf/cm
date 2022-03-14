@@ -17,7 +17,6 @@ Complex Generic Maps for Go
   * `DualMap` implements a map that can be keyed by either of two keys,
     packaging up a `map[Left]map[Right]Value` and
     `map[Right]map[Left]Value` into a single coherent package.
-  * `MapSlice` implements a map that contains slices, like `map[K][]V`.
   * `MapSet` implements a map that contains sets, like `map[K]Set[V]`.
 
 There's nothing particularly "special" about this implementation, no magic
@@ -95,6 +94,12 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.4.0:
+    * Removed MapSlice because upon an even more careful review of the
+      behavior of nil slices, it adds nothing. The `.Append` method I wrote
+      can also just be written as `m[key] = append(m[key], vals...)`
+      without loss. The remaining `.Set` method that removes the key
+      entirely for empty slices doesn't justify a full datatype.
 * 0.3.0:
     * Worked out a way to recover the `.Equal` method without a lot
       of nasty casting on values.
