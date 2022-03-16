@@ -11,8 +11,8 @@ existing map behavior to guide, it tries to match the same logic Go
 normally uses. This is justified because these are just wrappers around
 maps, rather than independent data structures. Most or all of the places
 where this library panics is places where the code was going to panic
-anyhow; this library simply offers more specific messages about the
-panic.
+anyhow; the panic calls in the code simply offer more direct guidance on
+the problem rather than panicking deep in library code.
 
 Multilevel Maps
 
@@ -37,10 +37,6 @@ In theory, you can drop this into any existing multilevel map you already
 have, and they should continue to work, give or take any type conversions
 as you pass them around. You just also have the additional methods added by
 this type.
-
-This allows setting values when the previous levels do not exist yet, and
-if all values from a particular sub-level are removed, all now-empty maps
-will be removed.
 
 Unlike single level maps where a sequence of the key values is the only
 sensible representation of the keys, multi-level maps have more than one

@@ -9,40 +9,23 @@ Complex Generic Maps for Go
 
 `cm` provides some generic complex maps for Go;
 
-  * `MapMap`, `MapMapMap`, `MapMapAny`, and `MapMapMapAny` provide maps
-    based on two and three keys that provide some convenience functions
-    around  the equivalent of `map[K1]map[K2]Value` and
-    `map[K1]map[K2]map[K3]Value` respectively, for easily setting and
-    fetching values.
+  * The equivalent of `map[A]map[B]C` and `map[A]map[B]map[C]D`, in two
+    flavors:
+    * `MapMap` and `MapMapMap` implement that, with the constraint that the
+      value type is `comparable`. This allows the equvialent of the maps'
+      package `.Equal` method.
+    * `MapMapAny` and `MapMapMapAny` are the same, but allowing the Value
+      type to be `any`. This removes the `.Equal` method but allows storing
+      any value.
   * `DualMap` implements a map that can be keyed by either of two keys,
-    packaging up a `map[Left]map[Right]Value` and
-    `map[Right]map[Left]Value` into a single coherent package.
+    packaging up a `map[A]map[B]C` and `map[B]map[A]C` into a single
+    coherent package. 
   * `MapSet` implements a map that contains sets, like `map[K]Set[V]`.
 
 There's nothing particularly "special" about this implementation, no magic
 sauce or anything. Just code I've had to write in several projects and
 would like to get factored out and into a well-tested library, rather than
 write over and over.
-
-MapMap(Map) vs. MapMap(Map)Any
-==============================
-
-I took inspiration from the
-current
-[maps package](https://pkg.go.dev/golang.org/x/exp@v0.0.0-20220307200941-a1099baf94bf/maps) and
-tried to implement all the functionality present there on the multi-level
-maps.
-
-In order to implement `.Equal`, the values of the map must be `comparable`.
-The `MapMap` and `MapMapMap` types implement this restriction, because
-many things stored in maps are indeed `comparable`. All methods on
-`MapMap(Map)Any` are available for those maps, and they also have a
-`.Equal`.
-
-If you want to store a non-`comparable` value in the map, `MapMap(Map)Any`
-is available. It drops the `comparable` restriction on the Value, and loses
-the `.Equal` method as a result. Switching the type of the map should not
-be very complicated in general, as the method sets are almost identical.
 
 Performance
 ===========
@@ -58,8 +41,8 @@ what even one map lookup requires.)
 Status
 ======
 
-version v0.3.0 is new, but headed towards production-grade. I intend to use
-this in my code.
+version v0.4.0 is new, but headed towards production-grade. I intend to use
+this in my code. But it is still pretty new.
 
 PRs
 ===
@@ -67,13 +50,20 @@ PRs
 I am actively accepting PRs. If this almost does what you want, please by
 all means file a PR to add it rather than starting a new project.
 
-The major caveat I'd give is, I'm trying not to be redundant to anything
-Go is going to provide anyhow in the future. I expect people using this
-project to understand that these types are _also_ normal Go maps that can
-be passed to
-the
-[maps package](https://pkg.go.dev/golang.org/x/exp@v0.0.0-20220307200941-a1099baf94bf/maps) (or
-whatever future version of that exists).
+However, I'm aiming for a library that *does not replace things we already
+have built-ins or implementations in the
+to-be-standard
+[maps package](https://pkg.go.dev/golang.org/x/exp@v0.0.0-20220307200941-a1099baf94bf/maps)*. Especially
+when implementations would be wildly slower than native support.
+
+So, for instance, I'm not interested in a `.OnValues(func (val V) ...)`
+implementation. The correct spelling of that is to go ahead and range over
+the relevant maps. This prevents a huge amount of function call overhead
+for something that the range-based for loops are more efficient for.
+
+Users of this library are expected to understand this library as helpful
+methods that work on the relevant data types, not as a complete replacement
+data type for maps.
 
 Code Signing
 ============
