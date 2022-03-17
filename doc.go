@@ -30,8 +30,7 @@ by this code will be violated. The delete methods provided by the
 multi-level maps will also clean up any higher-level maps left emptied by
 a delete. Directly executing deletes on the lower-level maps yourself
 will not automatically clean these maps up, which may also cause spurious
-keys to appear in the KeySlice and KeyTree functions, so I advise against
-deleting directly.
+keys to appear in the KeySlice method. Otherwise it is safe too.
 
 In theory, you can drop this into any existing multilevel map you already
 have, and they should continue to work, give or take any type conversions
@@ -54,8 +53,8 @@ of the two keys. Under the hood, it is simply both possible maps, and
 functions for setting and deleting by both keys.
 
 For your convenience, the two maps are left exported so you can efficiently
-read from them. Bear in mind that if you write directly to them, you will
-break the guarantees provided by the methods!
+read from them. Writing directly to them will violate the guarantees
+provided by this implementation and should generally not be done.
 
 Values are stored as given in both maps. This means that a dual-keyed map
 consumes twice the resources of a normal map. As a result you may want to
