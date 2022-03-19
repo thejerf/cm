@@ -72,12 +72,6 @@ func (mmm MapMapMap[K1, K2, K3, V]) DeleteByTuple(key Tuple3[K1, K2, K3]) {
 	MapMapMapAny[K1, K2, K3, V](mmm).DeleteByTuple(key)
 }
 
-// Get retreives by the given key. The second value is true if the key exists,
-// false otherwise.
-func (mmm MapMapMap[K1, K2, K3, V]) Get(key1 K1, key2 K2, key3 K3) (val V, exists bool) {
-	return MapMapMapAny[K1, K2, K3, V](mmm).Get(key1, key2, key3)
-}
-
 // GetByTuple retreives by the given tuple. The second value is true if the key
 // exists, false otherwise.
 //
@@ -174,21 +168,12 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) DeleteByTuple(key Tuple3[K1, K2, K3]) {
 	mmma.Delete(key.Key1, key.Key2, key.Key3)
 }
 
-// Get retreives by the given key. The second value is true if the key exists,
-// false otherwise.
-func (mmma MapMapMapAny[K1, K2, K3, V]) Get(key1 K1, key2 K2, key3 K3) (val V, exists bool) {
-	l1 := mmma[key1]
-	if l1 == nil {
-		exists = false
-		return
-	}
-	return l1.Get(key2, key3)
-}
-
-// Get retreives by the given tuple. The second value is true if the key
-// exists, false otherwise.
+// GetByTuple is a convenience function to retrieve the value out of the
+// map by the key tuple returned by KeySlice. Normal usage should just
+// index into the map like mmm[key1][key2][key3].
 func (mmma MapMapMapAny[K1, K2, K3, V]) GetByTuple(key Tuple3[K1, K2, K3]) (val V, exists bool) {
-	return mmma.Get(key.Key1, key.Key2, key.Key3)
+	val, exists = mmma[key.Key1][key.Key2][key.Key3]
+	return val, exists
 }
 
 // EqualFunc returns if this MapMapMap is equal to the passed-in MapMapMap,
@@ -238,21 +223,6 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) DeleteFunc(f func(K1, K2, K3, V) bool) {
 			delete(mmma, key1)
 		}
 	}
-}
-
-// GetThirdLevel safely fetches the third level of the multimap for the
-// given first two keys.
-//
-// Fetching the "second-level" map can be done by simply looking up the key1
-// value in the map, yielding either the corresponding MapMap or nil. This
-// method safely fetches the third-level map, or returns nil if either key1 or
-// (key1, key2) don't exist.
-func (mmma MapMapMapAny[K1, K2, K3, V]) GetThirdLevel(key1 K1, key2 K2) map[K3]V {
-	l1 := mmma[key1]
-	if l1 == nil {
-		return nil
-	}
-	return l1[key2]
 }
 
 // Clone yields a shallow copy of the MapMapMapAny, with the values simply

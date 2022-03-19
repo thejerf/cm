@@ -12,7 +12,7 @@ func TestMapMapMapAny(t *testing.T) {
 	mlm.Set(0, 1, 2, 3)
 	mlm.SetByTuple(Tuple3[int, int, int]{4, 5, 6}, 7)
 
-	val, exists := mlm.Get(0, 1, 2)
+	val, exists := mlm[0][1][2]
 	if val != 3 || !exists {
 		t.Fatal("couldn't get a set value")
 	}
@@ -20,18 +20,9 @@ func TestMapMapMapAny(t *testing.T) {
 	if val != 7 || !exists {
 		t.Fatal("couldn't get a set value")
 	}
-	_, exists = mlm.Get(99, 99, 99)
+	_, exists = mlm[99][99][99]
 	if exists {
 		t.Fatal("can get things that don't exist")
-	}
-
-	thirdLevel := mlm.GetThirdLevel(0, 1)
-	if !reflect.DeepEqual(thirdLevel, map[int]int{2: 3}) {
-		t.Fatal("couldn't fetch third level")
-	}
-	thirdLevel = mlm.GetThirdLevel(99, 99)
-	if thirdLevel != nil {
-		t.Fatal("can get third levels of things that don't exist")
 	}
 
 	keySlice := mlm.KeySlice()
@@ -246,7 +237,7 @@ func TestMapMapMap(t *testing.T) {
 	mmm.DeleteByTuple(Tuple3[int, int, int]{1, 2, 3})
 	mmm.DeleteFunc(func(int, int, int, int) bool { return false })
 
-	val, exists := mmm.Get(2, 3, 4)
+	val, exists := mmm[2][3][4]
 	if val != 5 || !exists {
 		t.Fatal("Get is wrong")
 	}

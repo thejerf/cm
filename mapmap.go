@@ -74,12 +74,6 @@ func (mm MapMap[K1, K2, V]) DeleteByTuple(key Tuple2[K1, K2]) {
 	MapMapAny[K1, K2, V](mm).DeleteByTuple(key)
 }
 
-// Get retreives by the given key. The second value is true if the key exists,
-// false otherwise.
-func (mm MapMap[K1, K2, V]) Get(key1 K1, key2 K2) (val V, exists bool) {
-	return MapMapAny[K1, K2, V](mm).Get(key1, key2)
-}
-
 // GetByTuple retreives by the given tuple. The second value is true if the key
 // exists, false otherwise.
 //
@@ -192,28 +186,14 @@ func (mma MapMapAny[K1, K2, V]) DeleteByTuple(key Tuple2[K1, K2]) {
 	mma.Delete(key.Key1, key.Key2)
 }
 
-// Get retreives by the given key. The second value is true if the key exists,
-// false otherwise.
-func (mma MapMapAny[K1, K2, V]) Get(key1 K1, key2 K2) (val V, exists bool) {
-	if mma == nil {
-		panic("Get called on a nil MapMap")
-	}
-	l1 := mma[key1]
-	if l1 == nil {
-		exists = false
-		return
-	}
-	val, exists = l1[key2]
-	return
-}
-
 // GetByTuple retreives by the given tuple. The second value is true if the key
 // exists, false otherwise.
 //
 // GetByTuple called on a nil MapMap will not panic, and return
 // that the value was not found.
 func (mma MapMapAny[K1, K2, V]) GetByTuple(key Tuple2[K1, K2]) (val V, exists bool) {
-	return mma.Get(key.Key1, key.Key2)
+	val, exists = mma[key.Key1][key.Key2]
+	return val, exists
 }
 
 // Clone returns a copy of the MapMap struture, with the keys copied

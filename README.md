@@ -84,6 +84,14 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.5.0:
+    * Trimmed off the .Get functions from the `MapMap` and `MapMapMap` as
+      they are unnecessary.
+    * NewDualMap is removed because it doesn't matter; the first Set will
+      initialize the values and there is no reason to need them to be
+      initialized before that.
+    * DualMap's two maps are now called Primary and Reverse, which will
+      probably be easier to remember than Left and Right.
 * 0.4.0:
     * Removed MapSlice because upon an even more careful review of the
       behavior of nil slices, it adds nothing. The `.Append` method I wrote

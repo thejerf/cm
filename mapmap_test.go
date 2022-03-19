@@ -51,15 +51,15 @@ func TestMapMapAny(t *testing.T) {
 		t.Fatal("did not correctly set the values")
 	}
 
-	v, exists := mm.Get(0, 0)
+	v, exists := mm[0][0]
 	if exists || v != 0 {
 		t.Fatal("could fetch something that didn't exist!")
 	}
-	v, exists = mm.Get(-1, -1)
+	v, exists = mm[-1][-1]
 	if exists || v != 0 {
 		t.Fatal("could fetch something that didn't exist!")
 	}
-	v, exists = mm.Get(0, 1)
+	v, exists = mm[0][1]
 	if !exists || v != 6 {
 		t.Fatal("couldn't fetch something that exists")
 	}
@@ -280,9 +280,6 @@ func TestNilMapMap(t *testing.T) {
 	mm.Delete(0, 0)
 	mm.DeleteByTuple(Tuple2[int, int]{0, 0})
 
-	panics(t, "failed on Get", func() { mm.Get(0, 0) })
-	panics(t, "failed on GetByTuple", func() { mm.GetByTuple(Tuple2[int, int]{0, 0}) })
-
 	if mm.KeySlice() != nil {
 		t.Fatal("incorrect KeySlice from nil map")
 	}
@@ -310,7 +307,7 @@ func TestMapMap(t *testing.T) {
 	mm.DeleteByTuple(Tuple2[int, int]{1, 2})
 	mm.DeleteFunc(func(int, int, int) bool { return false })
 
-	val, exists := mm.Get(2, 3)
+	val, exists := mm[2][3]
 	if val != 4 || !exists {
 		t.Fatal("Get is wrong")
 	}

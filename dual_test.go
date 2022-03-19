@@ -7,7 +7,7 @@ import (
 )
 
 func TestDualMaps(t *testing.T) {
-	dm := NewDualMap[int, string, int]()
+	dm := DualMap[int, string, int]{}
 
 	dm.Set(0, "a", 100)
 
@@ -29,7 +29,7 @@ func TestDualMaps(t *testing.T) {
 
 	dm.SetByTuple(Tuple2[int, string]{0, "b"}, 200)
 
-	v, exists := dm.Get(0, "a")
+	v, exists := dm.Primary[0]["a"]
 	if v != 100 || !exists {
 		t.Fatal("couldn't get value")
 	}
@@ -39,11 +39,11 @@ func TestDualMaps(t *testing.T) {
 	}
 
 	dm.Delete(0, "a")
-	_, exists = dm.Get(0, "a")
+	_, exists = dm.Primary[0]["a"]
 	if exists {
 		t.Fatal("can fetch deleted values")
 	}
-	v, exists = dm.Get(0, "b")
+	v, exists = dm.Primary[0]["b"]
 	if v != 200 || !exists {
 		t.Fatal("over-deleted value")
 	}
@@ -52,7 +52,7 @@ func TestDualMaps(t *testing.T) {
 
 	dm = DualMap[int, string, int]{}
 	dm.Set(0, "a", 300)
-	v, exists = dm.Get(0, "a")
+	v, exists = dm.Primary[0]["a"]
 	if v != 300 || !exists {
 		fmt.Println(v, exists)
 		t.Fatal("couldn't set into zero-value DualMap")

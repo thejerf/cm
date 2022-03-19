@@ -6,62 +6,60 @@ package cm
 // multilevel map, which provides no querying capability with just the
 // second level of a key (other than scanning the whole thing).
 //
-// The full key (LK, RK) must be unique, but there can be any number of
-// "lefts" associated with a given "right key" and vice versa.
+// The full key (P, S) must be unique, but there can be any number of
+// "primaries" associated with a given "secondary key" and vice versa.
+//
+// I have found it convenient to remember the map as having one of the
+// particular types as "primary", so this map refers to the "Primary"
+// mapping and the "Reverse" mapping. This helps keep straight which keys
+// are which, even in situations where you have no particular preference.
 //
 // The zero-value of this struct is safe to use. When Set is first used,
-// the maps will be initialized. NewDualMap is provided for your
-// convenience if you want a DualMap with guaranteed-non-nil internal maps.
+// the maps will be initialized.
 //
 // Direct read access is permissible. You should not directly write to the
 // maps. DualMap makes no guarantees if you directly write to the internal
 // maps.
-type DualMap[LK, RK comparable, V any] struct {
-	Left  MapMapAny[LK, RK, V]
-	Right MapMapAny[RK, LK, V]
+type DualMap[P, S comparable, V any] struct {
+	Primary  MapMapAny[P, S, V]
+	Reverse MapMapAny[S, P, V]
 }
 
-// NewDualMap returns a new DualMap with the maps empty instead of nil.
-func NewDualMap[LK, RK comparable, V any]() DualMap[LK, RK, V] {
-	return DualMap[LK, RK, V]{
-		MapMapAny[LK, RK, V]{},
-		MapMapAny[RK, LK, V]{},
-	}
-}
-
-func (dm *DualMap[LK, RK, V]) Set(
-	l LK,
-	r RK,
+// Set sets the given value with the keys in primary/secondary order.
+func (dm *DualMap[P, S, V]) Set(
+	l P,
+	r S,
 	value V,
 ) {
-	if dm.Left == nil {
-		dm.Left = MapMapAny[LK, RK, V]{}
-		dm.Right = MapMapAny[RK, LK, V]{}
+	if dm.Primary == nil {
+		dm.Primary = MapMapAny[P, S, V]{}
+		dm.Reverse = MapMapAny[S, P, V]{}
 	}
-	dm.Left.Set(l, r, value)
-	dm.Right.Set(r, l, value)
+	dm.Primary.Set(l, r, value)
+	dm.Reverse.Set(r, l, value)
 }
 
-func (dm *DualMap[LK, RK, V]) SetByTuple(
-	key Tuple2[LK, RK],
+// SetByTuple sets by the tuple returned by the Primary's KeySlice method.
+func (dm *DualMap[P, S, V]) SetByTuple(
+	key Tuple2[P, S],
 	value V,
 ) {
 	dm.Set(key.Key1, key.Key2, value)
 }
 
-func (dm *DualMap[LK, RK, V]) Get(l LK, r RK) (V, bool) {
-	return dm.Left.Get(l, r)
+// GetByTuple retrieves by the tuple returned by the Primary's KeySlice method.
+func (dm *DualMap[P, S, V]) GetByTuple(key Tuple2[P, S]) (val V, exists bool) {
+	val, exists = dm.Primary[key.Key1][key.Key2]
+	return val, exists
 }
 
-func (dm *DualMap[LK, RK, V]) GetByTuple(key Tuple2[LK, RK]) (V, bool) {
-	return dm.Left.GetByTuple(key)
+// Delete deletes by the keys in primary/secondary order.
+func (dm *DualMap[P, S, V]) Delete(l P, r S) {
+	dm.Primary.Delete(l, r)
+	dm.Reverse.Delete(r, l)
 }
 
-func (dm *DualMap[LK, RK, V]) Delete(l LK, r RK) {
-	dm.Left.Delete(l, r)
-	dm.Right.Delete(r, l)
-}
-
-func (dm *DualMap[LK, RK, V]) DeleteByTuple(key Tuple2[LK, RK]) {
+// Delete deletes by the tuple returned by the Primary's KeySlice method.
+func (dm *DualMap[P, S, V]) DeleteByTuple(key Tuple2[P, S]) {
 	dm.Delete(key.Key1, key.Key2)
 }
