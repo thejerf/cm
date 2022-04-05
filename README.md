@@ -36,7 +36,7 @@ Complex Generic Maps for Go
     performance. So, for instance, `.Subtract` will modify the `Set` it is
     called on. I chose this because if you have a mutation-based library,
     but want to create a new set, it is easy to
-    `set.Close().Subtract(set2)`, but if you have a library that only works
+    `set.Clone().Subtract(set2)`, but if you have a library that only works
     by creating new values you can't get the higher performance of direct
     mutation. And in my experience, direct mutation is a frequently common
     case, as is cloning a set once and performing many mutation operations
