@@ -21,6 +21,26 @@ Complex Generic Maps for Go
     packaging up a `map[A]map[B]C` and `map[B]map[A]C` into a single
     coherent package. 
   * `MapSet` implements a map that contains sets, like `map[K]Set[V]`.
+  * To support `MapSet`, there's a ful `Set` implementation.
+
+    As I write this, there's a [proposal for a standard-library `Set` type
+    on github](https://github.com/golang/go/discussions/47331). It has
+    stalled out on lacking iterator support. This `Set` sidesteps that by
+    simply accepting that it is based on a map type, thus permitting a
+    standard `range` iteration. While a custom Set type may theoretically
+    permit higher performance for large sets, and it does make sense for
+    the standard library to consider such a case, this set type will be
+    acceptable for quite significantly sized sets.
+
+    This set is also biased in the direction of mutability and
+    performance. So, for instance, `.Subtract` will modify the `Set` it is
+    called on. I chose this because if you have a mutation-based library,
+    but want to create a new set, it is easy to
+    `set.Close().Subtract(set2)`, but if you have a library that only works
+    by creating new values you can't get the higher performance of direct
+    mutation. And in my experience, direct mutation is a frequently common
+    case, as is cloning a set once and performing many mutation operations
+    on it (like subtracting several sets).
 
 There's nothing particularly "special" about this implementation, no magic
 sauce or anything. Just code I've had to write in several projects and

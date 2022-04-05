@@ -23,6 +23,12 @@ type Set[M comparable] map[M]struct{}
 
 var void = struct{}{}
 
+// SetFromSlice loads a set in from a slice.
+//
+// It is not appropriate or indeed even possible for a library to select
+// how to serialize specific sets, but it can be helpful for JSON or YAML
+// serialization to embed a specific Set and then use this and AsSlice as a
+// pair to serialize a set as a slice instead of a map.
 func SetFromSlice[M comparable](l []M) Set[M] {
 	s := Set[M]{}
 
@@ -33,6 +39,7 @@ func SetFromSlice[M comparable](l []M) Set[M] {
 	return s
 }
 
+// Add will add the given value in to the set.
 func (s Set[M]) Add(v M) {
 	if s == nil {
 		panic("Add called on nil Set")
@@ -40,6 +47,9 @@ func (s Set[M]) Add(v M) {
 	s[v] = void
 }
 
+// AsSlice returns the set as a slice, in hash order.
+//
+// See comment on SetFromSlice.
 func (s Set[M]) AsSlice() []M {
 	vals := make([]M, 0, len(s))
 	for val := range s {
