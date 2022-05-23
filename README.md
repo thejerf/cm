@@ -41,6 +41,16 @@ Complex Generic Maps for Go
     mutation. And in my experience, direct mutation is a frequently common
     case, as is cloning a set once and performing many mutation operations
     on it (like subtracting several sets).
+  * To support this library there is also a Tuple2 and Tuple3 type. While
+    these may not be 'full featured' tuples, I have found a use for them in
+    table-based tests to avoid declaring
+
+        type SomeTestType struct {
+             In  Type1
+             Out Type2
+        }
+
+    If you're using this library anyhow, there's no harm in using them.
 
 There's nothing particularly "special" about this implementation, no magic
 sauce or anything. Just code I've had to write in several projects and

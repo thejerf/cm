@@ -57,11 +57,15 @@ read from them. Writing directly to them will violate the guarantees
 provided by this implementation and should generally not be done.
 
 Values are stored as given in both maps. This means that a dual-keyed map
-consumes twice the resources of a normal map. As a result you may want to
-consider storing pointers in the map if it is going to be very large.
-This is targeted for cases where a dual-key map is very convenient, but
-not large by modern standards. As you scale up needs like this you
-eventually need a database.
+consumes twice the resources of a normal map. This is targeted for cases
+where a dual-key map is very convenient, but not large by modern
+standards. As you scale up needs like this you eventually need a database.
+
+Because this simply stores the maps in both directions, you may want
+to double-check before using pointer types for either type. It is legal
+in Go to use pointers to key maps, but it may not have the desired
+or expected result, as it will result in one of the two directions keying
+off of object identity rather than value. This has its uses too, though.
 
 For dual-key maps, it is obvious how to store them, with a reasonable
 penalty. As you get into needs for three or more keys, the cost of this
