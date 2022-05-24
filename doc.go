@@ -1,7 +1,7 @@
 /*
 
 Package cm contains generic "complicated maps": multi-level maps, dual-key
-maps, maps containing slices, and maps containing sets.
+maps, and maps containing sets.
 
 This package provides no locking in the datastructures. All locking is
 the responsibility of code using these maps.
