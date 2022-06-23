@@ -262,3 +262,27 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) KeyTree() []KeyTree[K1, KeyTree[K2, K3]]
 	}
 	return r
 }
+
+// Values returns a slice containing all the values for this MapMapMap in a
+// nondeterministic order.
+func (mmma MapMapMapAny[K1, K2, K3, V]) Values() []V {
+	count := 0
+	for _, m1 := range mmma {
+		for _, m2 := range m1 {
+			count += len(m2)
+		}
+	}
+
+	result := make([]V, count)
+	count = 0
+
+	for _, m1 := range mmma {
+		for _, m2 := range m1 {
+			for _, val := range m2 {
+				result[count] = val
+				count++
+			}
+		}
+	}
+	return result
+}

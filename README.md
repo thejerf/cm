@@ -114,6 +114,9 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.6.0:
+    * Add a Values method to MapMap, MapMapAny, MapMapMap, and
+      MapMapMapAny.
 * 0.5.0:
     * Trimmed off the .Get functions from the `MapMap` and `MapMapMap` as
       they are unnecessary.

@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestMapMapAny(t *testing.T) {
@@ -49,6 +51,13 @@ func TestMapMapAny(t *testing.T) {
 		},
 	) {
 		t.Fatal("did not correctly set the values")
+	}
+
+	values := mm.Values()
+	sort.Ints(values)
+	if !reflect.DeepEqual(values, []int{5, 6, 8}) {
+		spew.Dump(values)
+		t.Fatal("incorrect values for .Value")
 	}
 
 	v, exists := mm[0][0]

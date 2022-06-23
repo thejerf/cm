@@ -51,6 +51,12 @@ func TestMapMapMapAny(t *testing.T) {
 		t.Fatal("incorrect key slice")
 	}
 
+	values := mlm.Values()
+	sort.Ints(values)
+	if !reflect.DeepEqual(values, []int{3, 7}) {
+		t.Fatal("incorrect values for .Value")
+	}
+
 	keyTree := mlm.KeyTree()
 	if keyTree[0].Key == 4 {
 		keyTree[0], keyTree[1] = keyTree[1], keyTree[0]
