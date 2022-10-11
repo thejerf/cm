@@ -172,3 +172,24 @@ func (s Set[M]) XOR(r Set[M]) Set[M] {
 
 	return sButNotR.Union(rButNotS)
 }
+
+// Returns a new set containing only the elements
+// that exist only in both sets.
+func (s Set[M]) Intersect(r Set[M]) Set[M] {
+	intersection := Set[M]{}
+	if len(s) < len(r) {
+		for elem := range s {
+			if r.Contains(elem) {
+				intersection.Add(elem)
+			}
+		}
+	} else {
+		for elem := range r {
+			if s.Contains(elem) {
+				intersection.Add(elem)
+			}
+		}
+	}
+
+	return intersection
+}

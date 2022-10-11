@@ -12,7 +12,7 @@ func TestMapSet(t *testing.T) {
 		ms.Add(1, 4)
 		ms.Add(4, 5)
 
-		if !ms.AllValueSet().Equal(SetFromSlice[int]([]int{3, 4, 5})) {
+		if !ms.AllValueSet().Equal(SetFromSlice([]int{3, 4, 5})) {
 			t.Fatal("AllValueSet didn't work")
 		}
 	}
@@ -32,8 +32,8 @@ func TestMapSet(t *testing.T) {
 
 	{
 		ms := MapSet[int, int]{}
-		s1 := SetFromSlice[int]([]int{1})
-		s2 := SetFromSlice[int]([]int{2})
+		s1 := SetFromSlice([]int{1})
+		s2 := SetFromSlice([]int{2})
 
 		ms.Union(0, s1)
 		if !ms[0].Contains(1) {
@@ -56,5 +56,5 @@ func TestNilMapSet(t *testing.T) {
 	}
 	ms.Delete(1, 2) // should not panic
 	panics(t, "failed on MapSet.Union",
-		func() { ms.Union(0, SetFromSlice[int]([]int{1})) })
+		func() { ms.Union(0, SetFromSlice([]int{1})) })
 }
