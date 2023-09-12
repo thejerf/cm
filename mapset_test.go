@@ -10,7 +10,7 @@ func TestMapSet(t *testing.T) {
 		ms := MapSet[int, int]{}
 		ms.Add(1, 3)
 		ms.Add(1, 4)
-		ms.Add(4, 5)
+		ms.AddByTuple(Tuple2[int, int]{4, 5})
 
 		if !ms.AllValueSet().Equal(SetFromSlice([]int{3, 4, 5})) {
 			t.Fatal("AllValueSet didn't work")

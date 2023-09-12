@@ -12,9 +12,9 @@ package cm
 // Perhaps the most subtle is, if you want something like "KeyTree" but
 // that returns sets, the MapSet is itself that thing. Just:
 //
-//   for key, set := range MyMapSet {
-//       // and here you have the key and the set accessible
-//   }
+//	for key, set := range MyMapSet {
+//	    // and here you have the key and the set accessible
+//	}
 //
 // Since the nil set is mostly functional, many operations can be performed
 // naturally simply by indexing the top-level map, even if that results in
@@ -23,8 +23,8 @@ package cm
 // valid set if necessary. For instance, there is no need for a .Contains
 // method; you can simply
 //
-//   ms := MapSet[int, int]{}
-//   ms[0].Contains(1) // will be false
+//	ms := MapSet[int, int]{}
+//	ms[0].Contains(1) // will be false
 //
 // This is legal, and will not vivify the set into the MapSet.
 //
@@ -62,6 +62,11 @@ func (ms MapSet[K, V]) Add(key K, val V) {
 	s[val] = void
 }
 
+// AddByTuple will add to the set via the given tuple.
+func (ms MapSet[K, V]) AddByTuple(key Tuple2[K, V]) {
+	ms.Add(key.Key1, key.Key2)
+}
+
 // Union will union the passed-in set into the Set for the given key,
 // creating it if necessary.
 func (ms MapSet[K, V]) Union(key K, r Set[V]) {
@@ -74,18 +79,18 @@ func (ms MapSet[K, V]) Union(key K, r Set[V]) {
 		ms[key] = s
 	}
 	s.Union(r)
-} 
+}
 
 func (ms MapSet[K, V]) Delete(key K, val V) {
-       if ms == nil {
-               return
-       }
-       s := ms[key]
-       if s == nil {
-               return
-       }
-       delete(s, val)
-       if len(s) == 0 {
-               delete(ms, key)
-       }
+	if ms == nil {
+		return
+	}
+	s := ms[key]
+	if s == nil {
+		return
+	}
+	delete(s, val)
+	if len(s) == 0 {
+		delete(ms, key)
+	}
 }

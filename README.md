@@ -68,11 +68,23 @@ be zero-performance-impact versus having directly written the code.
 but a highly-predictable branch should be lost in the noise compared to
 what even one map lookup requires.)
 
+Future Plans
+============
+
+[Proposal 61405: range over int &
+func)[https://github.com/golang/go/issues/61405] is something I'm
+keeping an eye on. If it is accepted this package will rapidly
+develop iterators based on it.
+
+If the standard library implements a .Set, I am not sure if I will
+switch to it. It depends on the details. I am tempted just to 1.0 this
+package as-is, and then roll out a v2 with the built-in set if there's
+a compelling reason.
+
 Status
 ======
 
-version v0.4.0 is new, but headed towards production-grade. I intend to use
-this in my code. But it is still pretty new.
+I am using this a lot in my own code.
 
 PRs
 ===
@@ -114,6 +126,10 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.7.0:
+    * Add AddByTuple to MapSet, as I encountered code where that was
+      useful.
+    * Add Intersect to Set.
 * 0.6.0:
     * Add a Values method to MapMap, MapMapAny, MapMapMap, and
       MapMapMapAny.
