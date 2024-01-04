@@ -100,11 +100,17 @@ func TestSetIntersect(t *testing.T) {
 	s2.Add(2)
 	s2.Add(4)
 	s2.Add(6)
+	s2.Add(7)
 
 	s3 := s1.Intersect(s2)
 
 	if !s3.Contains(2) {
 		t.Fatal("set doesn't intersect properly")
+	}
+
+	s4 := s2.Intersect(s3)
+	if !reflect.DeepEqual(s3, s4) {
+		t.Fatal("intersect is not commutative")
 	}
 }
 
