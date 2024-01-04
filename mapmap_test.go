@@ -117,6 +117,13 @@ func TestMapMapAny(t *testing.T) {
 		t.Fatal("Incorrect key tree")
 	}
 
+	if mm.Len() != 3 {
+		t.Fatalf("incorrect length for MapMapAny: %d", mm.Len())
+	}
+	if (MapMap[int, int, int](mm)).Len() != 3 {
+		t.Fatal("incorrect length for mapmap")
+	}
+
 	// And now, clean things up
 	mm.Delete(3, 4)
 	if !reflect.DeepEqual(mm,

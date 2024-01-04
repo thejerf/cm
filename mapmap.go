@@ -116,6 +116,11 @@ func (mm MapMap[K1, K2, V]) KeyTree() []KeyTree[K1, K2] {
 	return MapMapAny[K1, K2, V](mm).KeyTree()
 }
 
+// Len returns the total number of values in the MapMap.
+func (mm MapMap[K1, K2, V]) Len() int {
+	return MapMapAny[K1, K2, V](mm).Len()
+}
+
 // MapMapAny is a 2-level multimap, with two key types and a value type.
 type MapMapAny[K1, K2 comparable, V any] map[K1]map[K2]V
 
@@ -310,4 +315,13 @@ func (mma MapMapAny[K1, K2, V]) Values() []V {
 		}
 	}
 	return result
+}
+
+// Len returns the total number of values in the MapMap.
+func (mma MapMapAny[K1, K2, V]) Len() int {
+	l := 0
+	for _, subMap := range mma {
+		l += len(subMap)
+	}
+	return l
 }
