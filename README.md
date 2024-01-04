@@ -126,6 +126,9 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.8.0:
+    * Add a Len method to the various maps that require a loop to
+      compute them.
 * 0.7.0:
     * Add AddByTuple to MapSet, as I encountered code where that was
       useful.

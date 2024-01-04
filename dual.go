@@ -12,7 +12,9 @@ package cm
 // I have found it convenient to remember the map as having one of the
 // particular types as "primary", so this map refers to the "Primary"
 // mapping and the "Reverse" mapping. This helps keep straight which keys
-// are which, even in situations where you have no particular preference.
+// are which, even in situations where you have no particular
+// preference. If you have no preference, it doesn't actually matter;
+// DualMap entire point is to be fully symmetric on the types.
 //
 // The zero-value of this struct is safe to use. When Set is first used,
 // the maps will be initialized.
@@ -21,7 +23,7 @@ package cm
 // maps. DualMap makes no guarantees if you directly write to the internal
 // maps.
 type DualMap[P, S comparable, V any] struct {
-	Primary  MapMapAny[P, S, V]
+	Primary MapMapAny[P, S, V]
 	Reverse MapMapAny[S, P, V]
 }
 
