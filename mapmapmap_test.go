@@ -51,7 +51,7 @@ func TestMapMapMapAny(t *testing.T) {
 		t.Fatal("incorrect key slice")
 	}
 
-	values := mlm.Values()
+	values := mlm.ValueSlice()
 	sort.Ints(values)
 	if !reflect.DeepEqual(values, []int{3, 7}) {
 		t.Fatal("incorrect values for .Value")
@@ -266,4 +266,56 @@ func TestMapMapMap(t *testing.T) {
 
 	mmm.KeySlice()
 	mmm.KeyTree()
+}
+
+func TestMapMapMapIteration(t *testing.T) {
+	mmm := MapMapMap[int, int, int, int]{}
+
+	mmm.Set(0, 1, 2, 10)
+	mmm.Set(0, 3, 4, 10)
+	mmm.Set(1, 1, 1, 10)
+
+	keys := SetFromSlice(mmm.KeySlice())
+
+	count := 0
+	for key, val := range mmm.All() {
+		count++
+		keys.Remove(key)
+		if val != 10 {
+			t.Fatalf("incorrect value in iteration")
+		}
+	}
+	if len(keys) != 0 || count != 3 {
+		t.Fatal("incorrect number of keys")
+	}
+
+	keys = SetFromSlice(mmm.KeySlice())
+	count = 0
+	for key := range mmm.Keys() {
+		count++
+		keys.Remove(key)
+	}
+	if len(keys) != 0 || count != 3 {
+		t.Fatal("incorrect number of keys")
+	}
+
+	values := SetFromSlice(mmm.ValueSlice())
+	count = 0
+	for val := range mmm.Values() {
+		count++
+		values.Remove(val)
+	}
+	if len(keys) != 0 || count != 3 {
+		t.Fatal("incorrect value handling")
+	}
+
+	for _ = range mmm.Values() {
+		break
+	}
+	for _ = range mmm.Keys() {
+		break
+	}
+	for _, _ = range mmm.All() {
+		break
+	}
 }

@@ -6,6 +6,10 @@ package cm
 // multilevel map, which provides no querying capability with just the
 // second level of a key (other than scanning the whole thing).
 //
+// Note that both components of the DualMap are MapMapAnys, so all
+// methods available on those are available here as well, such as the
+// iteration methods.
+//
 // The full key (P, S) must be unique, but there can be any number of
 // "primaries" associated with a given "secondary key" and vice versa.
 //

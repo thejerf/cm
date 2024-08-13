@@ -1,6 +1,8 @@
 package cm
 
 import (
+	"iter"
+
 	"golang.org/x/exp/maps"
 )
 
@@ -101,14 +103,25 @@ func (mm MapMap[K1, K2, V]) DeleteFunc(f func(K1, K2, V) bool) {
 	MapMapAny[K1, K2, V](mm).DeleteFunc(f)
 }
 
-// KeySlice returns the keys of the mulitmap as a slice of Tuple2 values.
+// Keys returns an iterator on the keys as a Tuple2.
+func (mm MapMap[K1, K2, V]) Keys() iter.Seq[Tuple2[K1, K2]] {
+	return MapMapAny[K1, K2, V](mm).Keys()
+}
+
+// KeySlice returns the keys of the MapMap as a slice of Tuple2 values.
 //
 // A nil map will return a nil slice.
 func (mm MapMap[K1, K2, V]) KeySlice() []Tuple2[K1, K2] {
 	return MapMapAny[K1, K2, V](mm).KeySlice()
 }
 
-// KeyTree returns the keys of the multimap as a 2-level tree of the
+// All will return an iterator over the map that yields the keys as a
+// Tuple2, and the value in the value slot.
+func (mm MapMap[K1, K2, V]) All() iter.Seq2[Tuple2[K1, K2], V] {
+	return MapMapAny[K1, K2, V](mm).All()
+}
+
+// KeyTree returns the keys of the MapMap as a 2-level tree of the
 // various keys.
 //
 // A nil map will return a nil slice.
@@ -121,7 +134,22 @@ func (mm MapMap[K1, K2, V]) Len() int {
 	return MapMapAny[K1, K2, V](mm).Len()
 }
 
-// MapMapAny is a 2-level multimap, with two key types and a value type.
+// Values returns an iterator for all values in this MapMap in a
+// nondeterministic order.
+func (mm MapMap[K1, K2, V]) Values() iter.Seq[V] {
+	return MapMapAny[K1, K2, V](mm).Values()
+}
+
+// ValueSlice returns a slice containing all values for this MapMap in a
+// nondeterministic order.
+//
+// This is marginally more efficient than converting the iterator into
+// a slice as this counts up and pre-allocates the correct size in advance.
+func (mm MapMap[K1, K2, V]) ValueSlice() []V {
+	return MapMapAny[K1, K2, V](mm).ValueSlice()
+}
+
+// MapMapAny is a 2-level MapMap, with two key types and a value type.
 type MapMapAny[K1, K2 comparable, V any] map[K1]map[K2]V
 
 // Tuple2 is a two-element tuple struct with a slot for each of the two keys.
@@ -259,7 +287,23 @@ func (mma MapMapAny[K1, K2, V]) DeleteFunc(f func(K1, K2, V) bool) {
 	}
 }
 
-// KeySlice returns the keys of the mulitmap as a slice of Tuple2 values.
+// Keys returns an iterator on the keys as a Tuple2.
+func (mma MapMapAny[K1, K2, V]) Keys() iter.Seq[Tuple2[K1, K2]] {
+	// it may seem superficially tempting to pun this on to the
+	// key and value slots of an iter.Seq2, but that breaks the
+	// symmetry with MapMapMapAny.
+	return func(yield func(Tuple2[K1, K2]) bool) {
+		for key1, m1 := range mma {
+			for key2 := range m1 {
+				if !yield(Tuple2[K1, K2]{key1, key2}) {
+					return
+				}
+			}
+		}
+	}
+}
+
+// KeySlice returns the keys of the MapMap as a slice of Tuple2 values.
 //
 // A nil map will return a nil slice.
 func (mma MapMapAny[K1, K2, V]) KeySlice() []Tuple2[K1, K2] {
@@ -278,7 +322,21 @@ func (mma MapMapAny[K1, K2, V]) KeySlice() []Tuple2[K1, K2] {
 	return r
 }
 
-// KeyTree returns the keys of the multimap as a 2-level tree of the
+// All will return an iterator over the map that yields the keys as a
+// Tuple2, and the value in the value slot.
+func (mma MapMapAny[K1, K2, V]) All() iter.Seq2[Tuple2[K1, K2], V] {
+	return func(yield func(Tuple2[K1, K2], V) bool) {
+		for key1, m1 := range mma {
+			for key2, val := range m1 {
+				if !yield(Tuple2[K1, K2]{key1, key2}, val) {
+					return
+				}
+			}
+		}
+	}
+}
+
+// KeyTree returns the keys of the MapMap as a 2-level tree of the
 // various keys.
 //
 // A nil map will return a nil slice.
@@ -298,9 +356,26 @@ func (mma MapMapAny[K1, K2, V]) KeyTree() []KeyTree[K1, K2] {
 	return r
 }
 
-// Values returns a slice containing all values for this MapMap in a
+// Values returns an iterator for all values in this MapMap in a
 // nondeterministic order.
-func (mma MapMapAny[K1, K2, V]) Values() []V {
+func (mma MapMapAny[K1, K2, V]) Values() iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for _, m1 := range mma {
+			for _, val := range m1 {
+				if !yield(val) {
+					return
+				}
+			}
+		}
+	}
+}
+
+// ValueSlice returns a slice containing all values for this MapMap in a
+// nondeterministic order.
+//
+// This is marginally more efficient than converting the iterator into
+// a slice as this counts up and pre-allocates the correct size in advance.
+func (mma MapMapAny[K1, K2, V]) ValueSlice() []V {
 	count := 0
 	for _, m1 := range mma {
 		count += len(m1)

@@ -21,7 +21,7 @@ Complex Generic Maps for Go
     packaging up a `map[A]map[B]C` and `map[B]map[A]C` into a single
     coherent package. 
   * `MapSet` implements a map that contains sets, like `map[K]Set[V]`.
-  * To support `MapSet`, there's a ful `Set` implementation.
+  * To support `MapSet`, there's a full `Set` implementation.
 
     As I write this, there's a [proposal for a standard-library `Set` type
     on github](https://github.com/golang/go/discussions/47331). It has
@@ -57,6 +57,15 @@ sauce or anything. Just code I've had to write in several projects and
 would like to get factored out and into a well-tested library, rather than
 write over and over.
 
+Go Versions
+===========
+
+0.9.0 and beyond require Go 1.23 for the iterator support.
+
+0.8.0 can be used for Go verions after 1.18, for generic support. (If
+you need a 0.8.1 to fix the missing ValueSlice on MapMap(Map)?, let me
+know.)
+
 Performance
 ===========
 
@@ -71,11 +80,6 @@ what even one map lookup requires.)
 Future Plans
 ============
 
-[Proposal 61405: range over int &
-func)[https://github.com/golang/go/issues/61405] is something I'm
-keeping an eye on. If it is accepted this package will rapidly
-develop iterators based on it.
-
 If the standard library implements a .Set, I am not sure if I will
 switch to it. It depends on the details. I am tempted just to 1.0 this
 package as-is, and then roll out a v2 with the built-in set if there's
@@ -84,7 +88,8 @@ a compelling reason.
 Status
 ======
 
-I am using this a lot in my own code.
+I am using this a lot in my own code. With the release of rangefunc,
+I consider this a 1.0 candidate.
 
 PRs
 ===
@@ -97,11 +102,6 @@ have built-ins or implementations in the
 to-be-standard
 [maps package](https://pkg.go.dev/golang.org/x/exp@v0.0.0-20220307200941-a1099baf94bf/maps)*. Especially
 when implementations would be wildly slower than native support.
-
-So, for instance, I'm not interested in a `.OnValues(func (val V) ...)`
-implementation. The correct spelling of that is to go ahead and range over
-the relevant maps. This prevents a huge amount of function call overhead
-for something that the range-based for loops are more efficient for.
 
 Users of this library are expected to understand this library as helpful
 methods that work on the relevant data types, not as a complete replacement
@@ -126,7 +126,24 @@ At the moment, this is in pre-release, which means no guarantees whatsoever
 about backwards compatibility. Change is still happening frequently as I
 hone in on the best solutions.
 
+* 0.9.0:
+    * *BACKWARDS INCOMPATIBLE CHANGE*: Values is renamed to ValueSlice,
+      to allow Values to be used for iterators.
+    * rangefunc support is added to the data structures, allowing
+      efficient iteration without having to construct full slices.
+      This adds:
+      * MapMap[Any] gets All() for key/value, and Keys and Values for
+        their respective contents.
+      * Set gets SetFromIter to construct a set from an iter.Seq.
+      * MapSet gets a Values iterator for all values.
+      
+        Note that a Keys iterator is already _de facto_ available by
+        ranging on the MapSet itself.
+    * Added ValueSlice to MapMap, which was missing it.
 * 0.8.0:
+    * This is the last version that works back to 1.18. Future
+      versions require 1.23 for rangefunc support. (I am not inclined
+      to maintain multiple versions of this library in perpetuity.)
     * Add a Len method to the various maps that require a loop to
       compute them.
 * 0.7.0:

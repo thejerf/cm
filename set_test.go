@@ -152,3 +152,20 @@ func TestNilSet(t *testing.T) {
 		t.Fatal("subtract from a nil set is not nil")
 	}
 }
+
+func TestSetFromIterator(t *testing.T) {
+	mm := MapMap[int, int, int]{}
+
+	mm.Set(0, 1, 2)
+	mm.Set(1, 2, 3)
+
+	set := SetFromIter(mm.Keys())
+
+	set2 := Set[Tuple2[int, int]]{}
+	set2.Add(Tuple2[int, int]{0, 1})
+	set2.Add(Tuple2[int, int]{1, 2})
+
+	if !set.Equal(set2) {
+		t.Fatal("unexpected set from iter construction")
+	}
+}

@@ -1,5 +1,7 @@
 package cm
 
+import "iter"
+
 // MapMapMap is a map of map of maps that has a comparable Value type,
 // which allows for the .Equal method.
 //
@@ -99,11 +101,22 @@ func (mmm MapMapMap[K1, K2, K3, V]) DeleteFunc(f func(K1, K2, K3, V) bool) {
 	MapMapMapAny[K1, K2, K3, V](mmm).DeleteFunc(f)
 }
 
+// Keys returns th ekeys of the MapMapMap as an iterator of Tuple3s.
+func (mmm MapMapMap[K1, K2, K3, V]) Keys() iter.Seq[Tuple3[K1, K2, K3]] {
+	return MapMapMapAny[K1, K2, K3, V](mmm).Keys()
+}
+
 // KeySlice returns the keys of the mulitmap as a slice of Tuple2 values.
 //
 // A nil map will return a nil slice.
 func (mmm MapMapMap[K1, K2, K3, V]) KeySlice() []Tuple3[K1, K2, K3] {
 	return MapMapMapAny[K1, K2, K3, V](mmm).KeySlice()
+}
+
+// All returns the keys of the multimap as a Tuple3 values, and the
+// values of the map in the value slot.
+func (mmm MapMapMap[K1, K2, K3, V]) All() iter.Seq2[Tuple3[K1, K2, K3], V] {
+	return MapMapMapAny[K1, K2, K3, V](mmm).All()
 }
 
 // KeyTree returns the keys of the multimap as a 2-level tree of the
@@ -112,6 +125,17 @@ func (mmm MapMapMap[K1, K2, K3, V]) KeySlice() []Tuple3[K1, K2, K3] {
 // A nil map will return a nil slice.
 func (mmm MapMapMap[K1, K2, K3, V]) KeyTree() []KeyTree[K1, KeyTree[K2, K3]] {
 	return MapMapMapAny[K1, K2, K3, V](mmm).KeyTree()
+}
+
+// Values return an iterator for the values in nondeterministic order.
+func (mmm MapMapMap[K1, K2, K3, V]) Values() iter.Seq[V] {
+	return MapMapMapAny[K1, K2, K3, V](mmm).Values()
+}
+
+// ValueSlice returns a slice containing all the values for this
+// MapMapMap in a nondeterministic order.
+func (mmm MapMapMap[K1, K2, K3, V]) ValueSlice() []V {
+	return MapMapMapAny[K1, K2, K3, V](mmm).ValueSlice()
 }
 
 // Len returns the number of values in the MapMapMap.
@@ -242,6 +266,21 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) Clone() MapMapMapAny[K1, K2, K3, V] {
 	return newMMM
 }
 
+// Keys returns the keys of the MapMapMapAny as an iterator of Tuple3s.
+func (mmma MapMapMapAny[K1, K2, K3, V]) Keys() iter.Seq[Tuple3[K1, K2, K3]] {
+	return func(yield func(Tuple3[K1, K2, K3]) bool) {
+		for key1, m1 := range mmma {
+			for key2, m2 := range m1 {
+				for key3 := range m2 {
+					if !yield(Tuple3[K1, K2, K3]{key1, key2, key3}) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // KeySlice returns the keys of the mulitmap as a slice of Tuple3 values.
 func (mmma MapMapMapAny[K1, K2, K3, V]) KeySlice() []Tuple3[K1, K2, K3] {
 	r := []Tuple3[K1, K2, K3]{}
@@ -257,6 +296,22 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) KeySlice() []Tuple3[K1, K2, K3] {
 	return r
 }
 
+// All returns the keys of the multimap as a Tuple3 values, and the
+// values of the map in the value slot.
+func (mmma MapMapMapAny[K1, K2, K3, V]) All() iter.Seq2[Tuple3[K1, K2, K3], V] {
+	return func(yield func(Tuple3[K1, K2, K3], V) bool) {
+		for key1, m1 := range mmma {
+			for key2, m2 := range m1 {
+				for key3, val := range m2 {
+					if !yield(Tuple3[K1, K2, K3]{key1, key2, key3}, val) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // KeyTree returns the keys of the multimap as a 3-level tree of the
 // various keys.
 func (mmma MapMapMapAny[K1, K2, K3, V]) KeyTree() []KeyTree[K1, KeyTree[K2, K3]] {
@@ -268,9 +323,24 @@ func (mmma MapMapMapAny[K1, K2, K3, V]) KeyTree() []KeyTree[K1, KeyTree[K2, K3]]
 	return r
 }
 
-// Values returns a slice containing all the values for this MapMapMap in a
+// Values returns an iterator for the values in nondeterministic order.
+func (mmma MapMapMapAny[K1, K2, K3, V]) Values() iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for _, m1 := range mmma {
+			for _, m2 := range m1 {
+				for _, val := range m2 {
+					if !yield(val) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
+// ValueSlice returns a slice containing all the values for this MapMapMap in a
 // nondeterministic order.
-func (mmma MapMapMapAny[K1, K2, K3, V]) Values() []V {
+func (mmma MapMapMapAny[K1, K2, K3, V]) ValueSlice() []V {
 	count := 0
 	for _, m1 := range mmma {
 		for _, m2 := range m1 {

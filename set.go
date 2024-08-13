@@ -1,5 +1,7 @@
 package cm
 
+import "iter"
+
 // A Set wraps a map[Type]struct{} with various convenience functions to
 // turn it into a set.
 //
@@ -7,7 +9,9 @@ package cm
 // with map are not implemented. To get the contents of this set, use
 // maps.Keys. to clear a set, use maps.Clear, to get the number of elements
 // in a set, use length(), to iterate over the set, use range in a for
-// loop, etc. This only implements additional useful set functionality.
+// loop, etc. This only implements additional useful set
+// functionality. (In particular, there is no useful rangefunc to
+// offer that is not already provided by being a map under the hood.)
 //
 // This Set offer high-efficiency mutating operations on the map; for
 // instance, Union will copy the target Set into the Set the method is
@@ -33,6 +37,17 @@ func SetFromSlice[M comparable](l []M) Set[M] {
 	s := Set[M]{}
 
 	for _, val := range l {
+		s[val] = void
+	}
+
+	return s
+}
+
+// SetFromIter loads a set in from an iterator.
+func SetFromIter[M comparable](i iter.Seq[M]) Set[M] {
+	s := Set[M]{}
+
+	for val := range i {
 		s[val] = void
 	}
 

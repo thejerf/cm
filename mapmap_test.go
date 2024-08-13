@@ -53,7 +53,7 @@ func TestMapMapAny(t *testing.T) {
 		t.Fatal("did not correctly set the values")
 	}
 
-	values := mm.Values()
+	values := mm.ValueSlice()
 	sort.Ints(values)
 	if !reflect.DeepEqual(values, []int{5, 6, 8}) {
 		spew.Dump(values)
@@ -339,6 +339,59 @@ func TestMapMap(t *testing.T) {
 
 	mm.KeySlice()
 	mm.KeyTree()
+}
+
+func TestMapMapIteration(t *testing.T) {
+	mm := MapMap[int, int, int]{}
+
+	mm.Set(0, 1, 10)
+	mm.Set(0, 2, 10)
+	mm.Set(1, 4, 10)
+
+	keys := SetFromSlice(mm.KeySlice())
+
+	count := 0
+	for key, val := range mm.All() {
+		count++
+		keys.Remove(key)
+		if val != 10 {
+			t.Fatal("incorrect value in iteration")
+		}
+	}
+	if len(keys) != 0 || count != 3 {
+		t.Fatal("incorrect number of keys")
+	}
+
+	keys = SetFromSlice(mm.KeySlice())
+	count = 0
+	for key := range mm.Keys() {
+		count++
+		keys.Remove(key)
+	}
+	if len(keys) != 0 || count != 3 {
+		t.Fatalf("incorrect number of keys")
+	}
+
+	// not the best test since these are all just 10, but...
+	values := SetFromSlice(mm.ValueSlice())
+	count = 0
+	for val := range mm.Values() {
+		count++
+		values.Remove(val)
+	}
+	if len(values) != 0 || count != 3 {
+		t.Fatal("incorrect values")
+	}
+
+	for _ = range mm.Values() {
+		break
+	}
+	for _ = range mm.Keys() {
+		break
+	}
+	for _, _ = range mm.All() {
+		break
+	}
 }
 
 func panics(t *testing.T, message string, f func()) {

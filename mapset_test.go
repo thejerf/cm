@@ -22,6 +22,18 @@ func TestMapSet(t *testing.T) {
 		ms.Add(1, 2)
 		ms.Add(1, 3)
 
+		total := 0
+		for val := range ms.Values() {
+			total += val
+		}
+		if total != 5 {
+			t.Fatal("couldn't range on values")
+		}
+
+		for _ = range ms.Values() {
+			break
+		}
+
 		ms.Delete(99, 99)
 		ms.Delete(1, 2)
 		ms.Delete(1, 3)

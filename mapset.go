@@ -1,5 +1,7 @@
 package cm
 
+import "iter"
+
 // A MapSet is a map that contains sets. For example, a map of users to the
 // set of resources they are allowed to access.
 //
@@ -50,6 +52,7 @@ func (ms MapSet[K, V]) AllValueSet() Set[V] {
 	return retSet
 }
 
+// Add adds the given value to the mapset.
 func (ms MapSet[K, V]) Add(key K, val V) {
 	if ms == nil {
 		panic("Set called on a nil MapSet")
@@ -60,6 +63,19 @@ func (ms MapSet[K, V]) Add(key K, val V) {
 		ms[key] = s
 	}
 	s[val] = void
+}
+
+// Values yields all the values in the MapSet as an iterator.
+func (ms MapSet[K, V]) Values() iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for _, s := range ms {
+			for val := range s {
+				if !yield(val) {
+					return
+				}
+			}
+		}
+	}
 }
 
 // AddByTuple will add to the set via the given tuple.

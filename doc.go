@@ -14,6 +14,9 @@ where this library panics is places where the code was going to panic
 anyhow; the panic calls in the code simply offer more direct guidance on
 the problem rather than panicking deep in library code.
 
+Similarly, none of these data structures are thread-safe on their own,
+just like conventional Go maps.
+
 Multilevel Maps
 
 Multi-level maps are maps that have other maps as their values.
