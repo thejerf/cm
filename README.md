@@ -24,9 +24,8 @@ Complex Generic Maps for Go
   * To support `MapSet`, there's a full `Set` implementation.
 
     As I write this, there's a [proposal for a standard-library `Set` type
-    on github](https://github.com/golang/go/discussions/47331). It has
-    stalled out on lacking iterator support. This `Set` sidesteps that by
-    simply accepting that it is based on a map type, thus permitting a
+    on github](https://github.com/golang/go/discussions/47331). This `Set`
+    simply accepts that it is based on a map type, thus permitting a
     standard `range` iteration. While a custom Set type may theoretically
     permit higher performance for large sets, and it does make sense for
     the standard library to consider such a case, this set type will be
